@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
 
 @Entity
+@Table(name = "historico_agendamento")
 data class HistoricoAgendamento(
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

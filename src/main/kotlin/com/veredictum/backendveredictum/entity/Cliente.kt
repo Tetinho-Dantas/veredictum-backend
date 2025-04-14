@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.br.CPF
 import java.time.LocalDate
 
 @Entity
+@Table(name = "cliente")
 data class Cliente(
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.URL
 import java.time.LocalDateTime
 
 @Entity
+@Table(name = "agendamento")
 data class Agendamento(
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
