@@ -1,4 +1,71 @@
 package com.veredictum.backendveredictum.entity
 
-class Agendamento {
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.veredictum.backendveredictum.enums.TipoAgendamento
+import jakarta.persistence.*
+import jakarta.validation.constraints.*
+import org.hibernate.validator.constraints.URL
+import java.time.LocalDateTime
+
+@Entity
+data class Agendamento(
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var idAgendamento: Int? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "fk_cliente")
+    var cliente: Cliente,
+
+    @ManyToOne
+    @JoinColumn(name = "fk_usuario")
+    var usuario: Usuario,
+
+    @field:NotBlank(message = "A etiqueta é obrigatória")
+    @field:Size(max = 30, message = "A etiqueta não pode ter mais que 30 caracteres")
+    var etiqueta: String,
+
+    @field:NotNull(message = "O valor é obrigatório")
+    @field:DecimalMin(value = "0.0", inclusive = false, message = "O valor deve ser maior que 0")
+    var valor: Double,
+
+    @field:NotNull(message = "O tipo de agendamento é obrigatório")
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    var tipoAgendamento: TipoAgendamento,
+
+    @field:NotBlank(message = "A descrição é obrigatória")
+    @field:Size(max = 255, message = "A descrição não pode ter mais que 255 caracteres")
+    var descricao: String,
+
+    var dataInicio: LocalDateTime,
+
+    var dataFim: LocalDateTime,
+
+    var dataVencimento: LocalDateTime,
+
+    @field:URL(message = "A URL da nuvem deve ser válida (exemplo: https://exemplo.com).")
+    var urlNuvem: String,
+
+    @field:NotNull(message = "O status de pagamento é obrigatório")
+    @Column(columnDefinition = "TINYINT(1)")
+    var isPago: Boolean = false,
+
+    ) {
+    constructor() : this(
+        null,
+        Cliente(),
+        Usuario(),
+        "",
+        0.0,
+        TipoAgendamento.ATENDIMENTO, // Atribuindo um valor default
+        "",
+        LocalDateTime.now(),
+        LocalDateTime.now(),
+        LocalDateTime.now(),
+        "",
+        false
+    )
 }

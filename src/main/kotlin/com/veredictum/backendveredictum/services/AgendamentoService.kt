@@ -7,7 +7,6 @@ class AgendamentoService (
     val clienteRepository: ClienteRepository,
     val usuarioRepository: UsuarioRepository,
     val historicoAgendamentoRepository: HistoricoAgendamentoRepository,
-    val statusAgendamentoRepository: StatusAgendamentoRepository,
 ) {
 
 

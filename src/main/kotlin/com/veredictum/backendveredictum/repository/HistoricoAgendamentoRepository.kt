@@ -1,4 +1,8 @@
 package com.veredictum.backendveredictum.repository
 
-class HistoricoAgendamentoRepository {
+import com.veredictum.backendveredictum.entity.HistoricoAgendamento
+import org.springframework.data.jpa.repository.JpaRepository
+
+interface HistoricoAgendamentoRepository: JpaRepository<HistoricoAgendamento, Int> {
+
 }
