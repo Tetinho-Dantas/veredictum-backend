@@ -33,8 +33,7 @@ data class Agendamento(
     var valor: Double,
 
     @field:NotNull(message = "O tipo de agendamento é obrigatório")
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "varchar(50)")
     var tipoAgendamento: TipoAgendamento,
 
     @field:NotBlank(message = "A descrição é obrigatória")
@@ -51,7 +50,6 @@ data class Agendamento(
     var urlNuvem: String,
 
     @field:NotNull(message = "O status de pagamento é obrigatório")
-    @Column(columnDefinition = "TINYINT(1)")
     var isPago: Boolean = false,
 
     ) {

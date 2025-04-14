@@ -2,91 +2,147 @@ package com.veredictum.backendveredictum.controller
 
 import com.veredictum.backendveredictum.entity.Cliente
 import com.veredictum.backendveredictum.repository.ClienteRepository
+import com.veredictum.backendveredictum.dto.ClienteDTO
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
 
+@Tag(name = "Clientes", description = "Endpoints para gerenciar clientes")
 @RestController
 @RequestMapping("/clientes")
-class ClienteController (
+class ClienteController(
     val repository: ClienteRepository
 ) {
 
+    @Operation(
+        summary = "Buscar todos os clientes",
+        description = "Retorna todos os clientes ativos. Lista vazia se nenhum cliente for encontrado."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Clientes retornados com sucesso"),
+            ApiResponse(responseCode = "204", description = "Nenhum cliente encontrado")
+        ]
+    )
     @GetMapping
-    fun buscarTodos(): ResponseEntity<List<Cliente>> {
-        // Busca pelos clientes cadastrados e ordena pela coluna isAtivo
-        // DEVE LISTAR TRUE PRIMEIRO
+    fun buscarTodos(): ResponseEntity<List<ClienteDTO>> {
         val clientes = repository.findAllOrderByIsAtivo()
-
-        // Se a lista de clientes estiver vazia, retorna 204 No Content
         return if (clientes.isEmpty()) {
-            ResponseEntity.noContent().build()
+            ResponseEntity.noContent().build() // 204 No Content
         } else {
-            // Caso contrário, retorna 200 OK com a lista de clientes
-            ResponseEntity.ok(clientes)
+            // Converte a lista de clientes para DTOs
+            ResponseEntity.ok(clientes.map { it.toDTO() }) // 200 OK com lista de clientes
         }
-
     }
 
+    @Operation(
+        summary = "Buscar cliente por ID",
+        description = "Retorna o cliente com o ID fornecido."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Cliente encontrado"),
+            ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+        ]
+    )
     @GetMapping("/{id}")
-    fun buscarPorId(@PathVariable id: Int): ResponseEntity<Cliente> {
+    fun buscarPorId(@PathVariable id: Int): ResponseEntity<ClienteDTO> {
         return repository.findById(id)
-            // Se o cliente for encontrado (ou seja, o Optional contém um valor),
-            // o método map será executado, retornando um ResponseEntity.ok(cliente)
-            .map { cliente -> ResponseEntity.ok(cliente) }
-
-            // Caso o Optional esteja vazio (cliente não encontrado),
-            // será executado o orElse, que retorna ResponseEntity.notFound()
+            .map { cliente -> ResponseEntity.ok(cliente.toDTO()) }
             .orElse(ResponseEntity.notFound().build())
     }
 
+    @Operation(
+        summary = "Cadastrar novo cliente",
+        description = "Cria um novo cliente e retorna o cliente cadastrado."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "201", description = "Cliente criado com sucesso"),
+            ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+        ]
+    )
     @PostMapping
-    fun cadastrar(@RequestBody @Valid novoCliente: Cliente): ResponseEntity<Cliente> {
-        // Salva o cliente e já pega a entidade gerada (com ID e outros atributos preenchidos pelo JPA)
-        val clienteSalvo = repository.save(novoCliente)
+    fun cadastrar(@RequestBody @Valid novoClienteDTO: ClienteDTO): ResponseEntity<ClienteDTO> {
+        val indicador = novoClienteDTO.indicadorId?.let { id ->
+            repository.findById(id).orElseThrow {
+                ResponseStatusException(HttpStatus.BAD_REQUEST, "Indicador com ID $id não encontrado")
+            }
+        }
 
-        // Retorna 201 Created com o cliente no corpo da resposta
-        return ResponseEntity.status(201).body(clienteSalvo)
+        val novoCliente = Cliente(
+            nome = novoClienteDTO.nome,
+            indicador = indicador,
+            email = novoClienteDTO.email,
+            rg = novoClienteDTO.rg,
+            cpf = novoClienteDTO.cpf,
+            cnpj = novoClienteDTO.cnpj,
+            dataNascimento = novoClienteDTO.dataNascimento,
+            dataInicio = novoClienteDTO.dataInicio,
+            endereco = novoClienteDTO.endereco,
+            cep = novoClienteDTO.cep,
+            descricao = novoClienteDTO.descricao,
+            inscricaoEstadual = novoClienteDTO.inscricaoEstadual,
+            isProBono = novoClienteDTO.isProBono,
+            isAtivo = novoClienteDTO.isAtivo,
+            isJuridico = novoClienteDTO.isJuridico
+        )
+
+        val clienteSalvo = repository.save(novoCliente)
+        return ResponseEntity.status(HttpStatus.CREATED).body(clienteSalvo.toDTO())
     }
 
-
+    @Operation(
+        summary = "Atualizar cliente",
+        description = "Atualiza os dados do cliente com o ID informado. Se o corpo contiver um ID diferente, retorna erro."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Cliente atualizado com sucesso"),
+            ApiResponse(responseCode = "400", description = "ID inconsistente entre a URL e o corpo"),
+            ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+        ]
+    )
     @PutMapping("/{id}")
-    fun atualizar(@PathVariable id: Int, @RequestBody @Valid clienteAtualizado: Cliente): ResponseEntity<Cliente> {
-
-        // Se o corpo trouxer um ID diferente do da URL, retornamos 400 (Bad Request)
+    fun atualizar(@PathVariable id: Int, @RequestBody @Valid clienteAtualizado: Cliente): ResponseEntity<ClienteDTO> {
         if (clienteAtualizado.idCliente != null && clienteAtualizado.idCliente != id) {
             return ResponseEntity.badRequest().build()
         }
-
         return repository.findById(id).map { clienteExistente ->
-
-            // Garante que o cliente atualizado use o ID correto da URL
             clienteAtualizado.idCliente = id
-
-            // Salva e retorna o cliente atualizado
             val clienteSalvo = repository.save(clienteAtualizado)
-            ResponseEntity.ok(clienteSalvo)
-
+            ResponseEntity.ok(clienteSalvo.toDTO())
         }.orElseGet {
-            // Retorna 404 se o cliente não for encontrado
             ResponseEntity.notFound().build()
         }
-
     }
 
+    @Operation(
+        summary = "Atualização parcial do cliente",
+        description = "Atualiza parcialmente os dados do cliente utilizando um mapa de atualizações."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "200", description = "Cliente atualizado parcialmente com sucesso"),
+            ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+        ]
+    )
     @PatchMapping("/{id}")
     fun atualizarParcial(
         @PathVariable id: Int,
         @RequestBody atualizacoes: Map<String, Any>
-    ): ResponseEntity<Cliente> {
-
+    ): ResponseEntity<ClienteDTO> {
         return repository.findById(id).map { cliente ->
-
             atualizacoes.forEach { (chave, valor) ->
                 val valorStr = valor.toString()
-
-                // Ignora campos desconhecidos ou com valor vazio
                 if (valorStr.isNotBlank()) {
                     when (chave) {
                         "nome" -> cliente.nome = valorStr
@@ -103,47 +159,61 @@ class ClienteController (
                         "proBono" -> cliente.isProBono = valorStr.toBoolean()
                         "ativo" -> cliente.isAtivo = valorStr.toBoolean()
                         "juridico" -> cliente.isJuridico = valorStr.toBoolean()
-                        // Ignora campos desconhecidos
-                        else -> {}
+                        else -> {} // Ignora campos não reconhecidos
                     }
                 }
             }
-
             val clienteAtualizado = repository.save(cliente)
-            ResponseEntity.ok(clienteAtualizado)
-
+            ResponseEntity.ok(clienteAtualizado.toDTO())
         }.orElseGet {
-            // Retorna 404 se o cliente não existir
             ResponseEntity.notFound().build()
         }
     }
 
+    @Operation(
+        summary = "Inativar cliente",
+        description = "Marca o cliente como inativo (ativo=false)."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "Cliente inativado com sucesso"),
+            ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+        ]
+    )
     @PatchMapping("/{id}/inativar")
     fun inativar(@PathVariable id: Int): ResponseEntity<Void> {
         val clienteOptional = repository.findById(id)
-
         return if (clienteOptional.isPresent) {
             val cliente = clienteOptional.get()
             cliente.isAtivo = false
             repository.save(cliente)
-            ResponseEntity.noContent().build() // Retorna 204 sem corpo
+            ResponseEntity.noContent().build()
         } else {
-            ResponseEntity.status(404).build() // Retorna 404 se o cliente não for encontrado
+            ResponseEntity.status(404).build()
         }
     }
 
+    @Operation(
+        summary = "Ativar cliente",
+        description = "Marca o cliente como ativo (ativo=true)."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "Cliente ativado com sucesso"),
+            ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+        ]
+    )
     @PatchMapping("/{id}/ativar")
     fun ativar(@PathVariable id: Int): ResponseEntity<Void> {
         val clienteOptional = repository.findById(id)
-
         return if (clienteOptional.isPresent) {
             val cliente = clienteOptional.get()
             cliente.isAtivo = true
             repository.save(cliente)
-            ResponseEntity.noContent().build() // Retorna 204 sem corpo
+            ResponseEntity.noContent().build()
         } else {
-            ResponseEntity.status(404).build() // Retorna 404 se o cliente não for encontrado
+            ResponseEntity.status(404).build()
         }
     }
-
 }
+

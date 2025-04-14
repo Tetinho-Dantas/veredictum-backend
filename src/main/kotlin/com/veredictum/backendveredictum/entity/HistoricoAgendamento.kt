@@ -21,8 +21,7 @@ data class HistoricoAgendamento(
     @field:NotNull(message = "O agendamento é obrigatório")
     var agendamento: Agendamento,
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status_agendamento")
+    @Column(name = "status_agendamento", nullable = false, columnDefinition = "varchar(50)")
     @field:NotNull(message = "O status do agendamento é obrigatório")
     var statusAgendamento: StatusAgendamento,
 

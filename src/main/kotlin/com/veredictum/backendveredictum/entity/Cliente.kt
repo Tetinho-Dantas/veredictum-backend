@@ -1,6 +1,7 @@
 package com.veredictum.backendveredictum.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.veredictum.backendveredictum.dto.ClienteDTO
 import jakarta.persistence.*
 import jakarta.validation.constraints.*
 import org.hibernate.validator.constraints.br.CNPJ
@@ -60,13 +61,10 @@ data class Cliente(
     @field:Size(min = 9, max = 9, message = "A inscrição estadual deve ter exatamente 9 dígitos")
     var inscricaoEstadual: String? = null,
 
-    @Column(columnDefinition = "TINYINT(1)")
     var isProBono: Boolean? = false,
 
-    @Column(columnDefinition = "TINYINT(1)")
     var isAtivo: Boolean = true,
 
-    @Column(columnDefinition = "TINYINT(1)")
     var isJuridico: Boolean? = cnpj != null,
 
     ) {
@@ -102,4 +100,28 @@ data class Cliente(
         true,
         false
     )
+
+
+        // Função para converter a entidade Cliente em um ClienteDTO
+        fun toDTO(): ClienteDTO {
+            return ClienteDTO(
+                nome = this.nome?:"",
+                indicadorId = this.indicador?.idCliente,
+                email = this.email?:"",
+                rg = this.rg?:"",
+                cpf = this.cpf?:"",
+                cnpj = this.cnpj?:"",
+                dataNascimento = this.dataNascimento,
+                dataInicio = this.dataInicio,
+                endereco = this.endereco?:"",
+                cep = this.cep?:"",
+                descricao = this.descricao?:"",
+                inscricaoEstadual = this.inscricaoEstadual?:"",
+                isProBono = this.isProBono,
+                isAtivo = this.isAtivo,
+                isJuridico = !this.cnpj.isNullOrBlank()
+            )
+        }
+
+
 }
