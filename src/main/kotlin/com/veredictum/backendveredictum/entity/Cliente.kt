@@ -105,6 +105,7 @@ data class Cliente(
         // Função para converter a entidade Cliente em um ClienteDTO
         fun toDTO(): ClienteDTO {
             return ClienteDTO(
+                idCliente = this.idCliente?:0,
                 nome = this.nome?:"",
                 indicadorId = this.indicador?.idCliente,
                 email = this.email?:"",

@@ -3,6 +3,7 @@ package com.veredictum.backendveredictum.dto
 import java.time.LocalDate
 
 data class ClienteDTO (
+    val idCliente: Int,
     val nome: String,
     val indicadorId: Int?,
     val email: String,

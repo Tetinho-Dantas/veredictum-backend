@@ -145,6 +145,7 @@ class ClienteController(
                 val valorStr = valor.toString()
                 if (valorStr.isNotBlank()) {
                     when (chave) {
+                        "idCliente" -> cliente.idCliente = id
                         "nome" -> cliente.nome = valorStr
                         "email" -> cliente.email = valorStr
                         "rg" -> cliente.rg = valorStr
