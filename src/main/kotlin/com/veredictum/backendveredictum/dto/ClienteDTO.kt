@@ -8,7 +8,7 @@ data class ClienteDTO (
     val fkIndicador: Int?,
     val email: String,
     val rg: String,
-    val cpf: String,
+    val cpf: String?,
     val cnpj: String?,
     val dataNascimento: LocalDate?,
     val dataInicio: LocalDate?,

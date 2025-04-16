@@ -23,7 +23,7 @@ class ClienteController(
 
     @Operation(
         summary = "Buscar todos os clientes",
-        description = "Retorna todos os clientes ativos. Lista vazia se nenhum cliente for encontrado."
+        description = "Retorna todos os clientes ativos ordenado por isAtivo. Lista vazia se nenhum cliente for encontrado."
     )
     @ApiResponses(
         value = [
@@ -102,7 +102,7 @@ class ClienteController(
 
     @Operation(
         summary = "Atualizar cliente",
-        description = "Atualiza os dados do cliente com o ID informado. Se o corpo contiver um ID diferente, retorna erro."
+        description = "Atualiza os dados do cliente com o ID informado. Se o corpo contiver um ID diferente, é ignorado."
     )
     @ApiResponses(
         value = [
