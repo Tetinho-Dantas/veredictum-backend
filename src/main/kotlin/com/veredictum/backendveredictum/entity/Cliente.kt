@@ -107,7 +107,7 @@ data class Cliente(
             return ClienteDTO(
                 idCliente = this.idCliente?:0,
                 nome = this.nome?:"",
-                indicadorId = this.indicador?.idCliente,
+                fkIndicador = this.indicador?.idCliente,
                 email = this.email?:"",
                 rg = this.rg?:"",
                 cpf = this.cpf?:"",

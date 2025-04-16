@@ -5,7 +5,7 @@ import java.time.LocalDate
 data class ClienteDTO (
     val idCliente: Int,
     val nome: String,
-    val indicadorId: Int?,
+    val fkIndicador: Int?,
     val email: String,
     val rg: String,
     val cpf: String,
