@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.veredictum.backendveredictum.dto.LoginUsuarioDTO
 import com.veredictum.backendveredictum.dto.UsuarioDTO
 import jakarta.persistence.*
 import jakarta.validation.constraints.*
@@ -46,10 +47,19 @@ data class Usuario (
             idUsuario = this.idUsuario ?: 0,
             nome = this.nome,
             email = this.email,
-            senha = this.senha,
             isAtivo = this.isAtivo,
             fkAdm = this.administrador?.idUsuario,
             isAdm = this.isAdm,
+        )
+    }
+
+    fun toLoginDTO(logado: Boolean): LoginUsuarioDTO {
+        return LoginUsuarioDTO(
+            idUsuario = this.idUsuario ?: 0,
+            nome = this.nome,
+            email = this.email,
+            isAtivo = this.isAtivo,
+            isLogado = logado,
         )
     }
 
