@@ -23,7 +23,7 @@ class ClienteController(
 
     @Operation(
         summary = "Buscar todos os clientes",
-        description = "Retorna todos os clientes ativos ordenado por isAtivo. Lista vazia se nenhum cliente for encontrado."
+        description = "Retorna todos os clientes ativos ordenado por isAtivo. NotFound se nenhum cliente for encontrado."
     )
     @ApiResponses(
         value = [

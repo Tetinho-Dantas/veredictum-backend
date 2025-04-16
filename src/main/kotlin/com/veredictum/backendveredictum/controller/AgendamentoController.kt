@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/atendimentos")
 class AgendamentoController
     (
-    val agendamentoService: AgendamentoService,
+    private val agendamentoService: AgendamentoService,
     )
 {
 
