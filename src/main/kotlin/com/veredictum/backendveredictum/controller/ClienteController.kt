@@ -72,7 +72,7 @@ class ClienteController(
     )
     @PostMapping
     fun cadastrar(@RequestBody @Valid novoClienteDTO: ClienteDTO): ResponseEntity<ClienteDTO> {
-        val indicador = novoClienteDTO.indicadorId?.let { id ->
+        val indicador = novoClienteDTO.fkIndicador?.let { id ->
             repository.findById(id).orElseThrow {
                 ResponseStatusException(HttpStatus.BAD_REQUEST, "Indicador com ID $id não encontrado")
             }

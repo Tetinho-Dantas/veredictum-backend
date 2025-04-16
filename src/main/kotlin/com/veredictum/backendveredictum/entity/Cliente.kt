@@ -34,11 +34,9 @@ data class Cliente(
     @field:Size(min = 10, max = 10, message = "O RG deve ter exatamente 10 caracteres")
     var rg: String? = null,
 
-    @field:CPF(message = "CPF inválido")
     @field:Size(min = 11, max = 11, message = "O CPF deve ter exatamente 11 dígitos")
     var cpf: String? = null,
 
-    @field:CNPJ(message = "CNPJ inválido")
     @field:Size(min = 14, max = 14, message = "O CNPJ deve ter exatamente 14 dígitos")
     var cnpj: String? = null,
 
