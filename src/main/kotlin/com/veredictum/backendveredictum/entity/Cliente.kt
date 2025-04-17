@@ -31,13 +31,13 @@ data class Cliente(
     @field:Size(max = 255, message = "O e-mail deve ter no máximo 255 caracteres")
     var email: String? = null,
 
-    @field:Size(min = 10, max = 10, message = "O RG deve ter exatamente 10 caracteres")
+    @field:Size( max = 10, message = "O RG deve ter no máximo 10 caracteres")
     var rg: String? = null,
 
-    @field:Size(min = 11, max = 11, message = "O CPF deve ter exatamente 11 dígitos")
+    @field:Size( max = 11, message = "O CPF deve ter no máximo 11 dígitos")
     var cpf: String? = null,
 
-    @field:Size(min = 14, max = 14, message = "O CNPJ deve ter exatamente 14 dígitos")
+    @field:Size( max = 14, message = "O CNPJ deve ter no máximo 14 dígitos")
     var cnpj: String? = null,
 
     @field:NotNull(message = "A data de nascimento é obrigatória")
